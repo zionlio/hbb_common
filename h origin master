@@ -1,0 +1,68 @@
+[33mcommit 77f3459f3e70ae776dbfe16b7e90f63f88e0798d[m[33m ([m[1;36mHEAD[m[33m)[m
+Author: IMStepFather <lx6688@88.com>
+Date:   Mon Feb 10 07:03:03 2025 +0800
+
+    增加API-server
+
+[33mcommit 6ad111aee6c1ca6d9cc7179414d90764e410adea[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: IMStepFather <133768437+IMStepFather@users.noreply.github.com>
+Date:   Sun Feb 9 03:24:36 2025 +0800
+
+    config.rs
+    
+    将2225行，API_SERVER改为api-server
+
+[33mcommit 4d430d7f47a50c5e300b77cec3bc2bd3d47e69aa[m
+Author: IMStepFather <133768437+IMStepFather@users.noreply.github.com>
+Date:   Sun Feb 9 00:27:19 2025 +0800
+
+    修改
+
+[33mcommit 97266d7c180feef8b43726ea6fcb4491e3fd8752[m
+Author: RustDesk <71636191+rustdesk@users.noreply.github.com>
+Date:   Wed Jan 29 16:56:17 2025 +0800
+
+    Update config.rs
+
+[33mcommit 03628a8289ea49795f1e3322a054b0dc4c95c55b[m
+Author: RustDesk <71636191+rustdesk@users.noreply.github.com>
+Date:   Wed Jan 29 16:47:38 2025 +0800
+
+    Update config.rs
+
+[33mcommit 22a570737008a6e95ae703ca4f721018024ccd8b[m
+Author: RustDesk <71636191+rustdesk@users.noreply.github.com>
+Date:   Wed Jan 29 16:46:59 2025 +0800
+
+    Update config.rs
+
+[33mcommit 33d90c7e077d1aeb37341df3f8bd84044092d851[m
+Author: RustDesk <71636191+rustdesk@users.noreply.github.com>
+Date:   Wed Jan 29 16:44:36 2025 +0800
+
+    Simplicity is a double-edged sword. It makes things easier for you and me, but it also makes things easier for bad people. So we decided to reduce the convenience.
+
+[33mcommit 79f8ac2d68e7b3304773c553f91f1de825bacdf5[m
+Merge: 49c6b24 e646eb9
+Author: RustDesk <71636191+rustdesk@users.noreply.github.com>
+Date:   Sun Jan 26 16:51:36 2025 +0800
+
+    Merge pull request #4 from fufesou/feat/file_clipboard_try_empty
+    
+    feat: file clipboard, try empty message
+
+[33mcommit e646eb9f4de014894280b81699cc94c76e11a164[m
+Author: fufesou <linlong1266@gmail.com>
+Date:   Tue Jan 21 22:04:53 2025 +0800
+
+    feat: file clipboard, try empty message
+    
+    Signed-off-by: fufesou <linlong1266@gmail.com>
+
+[33mcommit 49c6b24a7a8c39d4448e07b743007ef1a3febd43[m
+Author: 21pages <sunboeasy@gmail.com>
+Date:   Mon Jan 13 11:15:51 2025 +0800
+
+    init
+    
+    Signed-off-by: 21pages <sunboeasy@gmail.com>
