@@ -98,6 +98,7 @@ const CHARS: &[char] = &[
 ];
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &["hwrustdesk.lxjl.love"];
+pub const OPTION_API_SERVER: &str = "hwrustdesk.lxjl.love";
 pub const RS_PUB_KEY: &str = "Lixi40233251";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
