@@ -99,8 +99,22 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["hushdesk.acin.pt"];
-pub const RS_PUB_KEY: &str = "6AXxvILMK+iImwOnJP3vmKPLvoQKxPrBAqQKm3kcISM=";
+No meu config.rs ficou assim a parte que ele lê a variável RENDEZVOUS_SERVER:
+```
+    static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
+    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new(match option_env!("RENDEZVOUS_SERVER") {
+        Some(key) if !key.is_empty() => key,
+        _ => "",
+    }.to_owned());
+    pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
+
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
+pub const PUBLIC_RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+
+pub const RS_PUB_KEY: &str = match option_env!("RS_PUB_KEY") {
+    Some(key) if !key.is_empty() => key,
+    _ => PUBLIC_RS_PUB_KEY,
+};
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
