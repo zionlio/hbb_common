@@ -99,15 +99,6 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-No meu config.rs ficou assim a parte que ele lê a variável RENDEZVOUS_SERVER:
-```
-    static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
-    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new(match option_env!("RENDEZVOUS_SERVER") {
-        Some(key) if !key.is_empty() => key,
-        _ => "",
-    }.to_owned());
-    pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
-
 pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
 pub const PUBLIC_RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
 
