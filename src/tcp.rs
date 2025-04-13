@@ -1,4 +1,4 @@
-use crate::{bail, bytes_codec::BytesCodec, ResultType, config::Socks5Server, proxy::Proxy};
+use crate::{bail, bytes_codec::BytesCodec, config::Socks5Server, proxy::Proxy, ResultType};
 use anyhow::Context as AnyhowCtx;
 use bytes::{BufMut, Bytes, BytesMut};
 use futures::{SinkExt, StreamExt};
@@ -189,11 +189,7 @@ impl FramedStream {
 
     #[inline]
     pub async fn next_timeout(&mut self, ms: u64) -> Option<Result<BytesMut, Error>> {
-        if let Ok(res) = super::timeout(ms, self.next()).await {
-            res
-        } else {
-            None
-        }
+        (super::timeout(ms, self.next()).await).unwrap_or_default()
     }
 
     pub fn set_key(&mut self, key: Key) {
@@ -317,7 +313,7 @@ impl Encrypt {
     pub fn enc(&mut self, data: &[u8]) -> Vec<u8> {
         self.1 += 1;
         let nonce = FramedStream::get_nonce(self.1);
-        secretbox::seal(&data, &nonce, &self.0)
+        secretbox::seal(data, &nonce, &self.0)
     }
 
     pub fn decode(
@@ -332,7 +328,7 @@ impl Encrypt {
         let mut pk_ = [0u8; box_::PUBLICKEYBYTES];
         pk_[..].copy_from_slice(their_pk_b);
         let their_pk_b = box_::PublicKey(pk_);
-        let symmetric_key = box_::open(symmetric_data, &nonce, &their_pk_b, &our_sk_b)
+        let symmetric_key = box_::open(symmetric_data, &nonce, &their_pk_b, our_sk_b)
             .map_err(|_| anyhow::anyhow!("Handshake failed: box decryption failure"))?;
         if symmetric_key.len() != secretbox::KEYBYTES {
             anyhow::bail!("Handshake failed: invalid secret key length from peer");

@@ -174,7 +174,7 @@ impl AddrMangle {
         let mut padded = [0u8; 16];
         padded[..bytes.len()].copy_from_slice(bytes);
         let number = u128::from_le_bytes(padded);
-        let tm = (number >> 17) & (u32::max_value() as u128);
+        let tm = (number >> 17) & (u32::MAX as u128);
         let ip = (((number >> 49) - tm) as u32).to_le_bytes();
         let port = (number & 0xFFFFFF) - (tm & 0xFFFF);
         SocketAddr::V4(SocketAddrV4::new(
