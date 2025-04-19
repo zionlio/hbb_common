@@ -759,7 +759,7 @@ impl Config {
                 return ss;
             }
         }
-        return RENDEZVOUS_SERVERS.iter().map(|x| x.to_string()).collect();
+        RENDEZVOUS_SERVERS.iter().map(|x| x.to_string()).collect()
     }
 
     pub fn reset_online() {
@@ -992,7 +992,7 @@ impl Config {
             .read()
             .unwrap()
             .get("password")
-            .map_or(false, |v| v == password)
+            .is_some_and(|v| v == password)
         {
             return;
         }
@@ -1139,8 +1139,8 @@ impl Config {
         trusted_devices.retain(|d| !d.outdate());
         let devices = serde_json::to_string(&trusted_devices).unwrap_or_default();
         let max_len = 1024 * 1024;
-        if devices.bytes().len() > max_len {
-            log::error!("Trusted devices too large: {}", devices.bytes().len());
+        if devices.len() > max_len {
+            log::error!("Trusted devices too large: {}", devices.len());
             return;
         }
         let devices = encrypt_str_or_original(&devices, PASSWORD_ENC_VERSION, max_len);
@@ -1157,7 +1157,7 @@ impl Config {
         Self::set_trusted_devices(devices);
     }
 
-    pub fn remove_trusted_devices(hwids: &Vec<Bytes>) {
+    pub fn remove_trusted_devices(hwids: &[Bytes]) {
         let mut devices = Self::get_trusted_devices();
         devices.retain(|d| !hwids.contains(&d.hwid));
         Self::set_trusted_devices(devices);
@@ -1388,7 +1388,7 @@ impl PeerConfig {
     }
 
     pub fn batch_peers(
-        all: &Vec<(String, SystemTime, PathBuf)>,
+        all: &[(String, SystemTime, PathBuf)],
         from: usize,
         to: Option<usize>,
     ) -> (Vec<(String, SystemTime, PeerConfig)>, usize) {
@@ -1409,11 +1409,11 @@ impl PeerConfig {
         let peers: Vec<_> = all[from..to]
             .iter()
             .map(|(id, t, p)| {
-                let c = PeerConfig::load(&id);
+                let c = PeerConfig::load(id);
                 if c.info.platform.is_empty() {
                     fs::remove_file(p).ok();
                 }
-                (id.clone(), t.clone(), c)
+                (id.clone(), *t, c)
             })
             .filter(|p| !p.2.info.platform.is_empty())
             .collect();
@@ -2191,7 +2191,7 @@ fn is_option_can_save(
     v: &str,
 ) -> bool {
     if overwrite.read().unwrap().contains_key(k)
-        || defaults.read().unwrap().get(k).map_or(false, |x| x == v)
+        || defaults.read().unwrap().get(k).is_some_and(|x| x == v)
     {
         return false;
     }
@@ -2204,7 +2204,7 @@ pub fn is_incoming_only() -> bool {
         .read()
         .unwrap()
         .get("conn-type")
-        .map_or(false, |x| x == ("incoming"))
+        .is_some_and(|x| x == ("incoming"))
 }
 
 #[inline]
@@ -2213,7 +2213,7 @@ pub fn is_outgoing_only() -> bool {
         .read()
         .unwrap()
         .get("conn-type")
-        .map_or(false, |x| x == ("outgoing"))
+        .is_some_and(|x| x == ("outgoing"))
 }
 
 #[inline]
@@ -2222,7 +2222,7 @@ fn is_some_hard_opton(name: &str) -> bool {
         .read()
         .unwrap()
         .get(name)
-        .map_or(false, |x| x == ("Y"))
+        .is_some_and(|x| x == ("Y"))
 }
 
 #[inline]
