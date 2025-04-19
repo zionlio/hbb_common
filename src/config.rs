@@ -9,7 +9,7 @@ use std::{
     time::{Duration, Instant, SystemTime},
 };
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use bytes::Bytes;
 use rand::Rng;
 use regex::Regex;
@@ -41,6 +41,16 @@ const SERIAL: i32 = 3;
 const PASSWORD_ENC_VERSION: &str = "00";
 pub const ENCRYPT_MAX_LEN: usize = 128; // used for password, pin, etc, not for all
 
+#[derive(Deserialize)]
+struct ResponseBody {
+    data: IpData,
+}
+
+#[derive(Deserialize)]
+struct IpData {
+    ip: String,
+}
+
 #[cfg(target_os = "macos")]
 lazy_static::lazy_static! {
     pub static ref ORG: RwLock<String> = RwLock::new("com.carriez".to_owned());
@@ -58,7 +68,7 @@ lazy_static::lazy_static! {
     static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
     pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("".to_owned());
     pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
-    pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
+    pub static ref APP_NAME: RwLock<String> = RwLock::new("rustdesk".to_owned());
     static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
     static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
@@ -102,6 +112,7 @@ pub const RENDEZVOUS_SERVERS: &[&str] = &["10.6.4.75"];
 pub const RS_PUB_KEY: &str = "IPT+Ws5Knr1n0c9k0yTpkwqeIAsVdO3iLtUh4S1jR44=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
+
 pub const RELAY_PORT: i32 = 21117;
 
 macro_rules! serde_field_string {
@@ -170,6 +181,7 @@ pub struct Config {
         deserialize_with = "deserialize_string"
     )]
     pub id: String, // use
+    pub ip: String, // use
     #[serde(default, deserialize_with = "deserialize_string")]
     enc_id: String, // store
     #[serde(default, deserialize_with = "deserialize_string")]
@@ -923,6 +935,38 @@ impl Config {
             b
         } else {
             a
+        }
+    }
+
+    pub async fn get_local_ip() -> String {
+        let url: &str = "http://10.6.1.100/api/getIpAddress";
+        let client = reqwest::blocking::Client::new();
+        match client.get(url).send() {
+            Ok(response) => match response.json::<ResponseBody>() {
+                Ok(body) => {
+                    let ip = body.data.ip;
+                    let cleaned_ip = ip.strip_prefix("::ffff:").unwrap_or(&ip);
+                    cleaned_ip.to_string()
+                }
+                Err(_) => "".to_string(),
+            },
+            Err(_) => "".to_string(),
+        }
+    }
+
+    pub fn get_ip_address() -> String {
+        let url: &str = "http://10.6.1.100/api/getIpAddress";
+        let client = reqwest::blocking::Client::new();
+        match client.get(url).send() {
+            Ok(response) => match response.json::<ResponseBody>() {
+                Ok(body) => {
+                    let ip = body.data.ip;
+                    let cleaned_ip = ip.strip_prefix("::ffff:").unwrap_or(&ip);
+                    cleaned_ip.to_string()
+                }
+                Err(_) => "".to_string(),
+            },
+            Err(_) => "".to_string(),
         }
     }
 
