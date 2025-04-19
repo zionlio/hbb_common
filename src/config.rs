@@ -9,7 +9,7 @@ use std::{
     time::{Duration, Instant, SystemTime},
 };
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use bytes::Bytes;
 use rand::Rng;
 use regex::Regex;
@@ -40,16 +40,6 @@ pub const COMPRESS_LEVEL: i32 = 3;
 const SERIAL: i32 = 3;
 const PASSWORD_ENC_VERSION: &str = "00";
 pub const ENCRYPT_MAX_LEN: usize = 128; // used for password, pin, etc, not for all
-
-#[derive(Deserialize)]
-struct ResponseBody {
-    data: IpData,
-}
-
-#[derive(Deserialize)]
-struct IpData {
-    ip: String,
-}
 
 #[cfg(target_os = "macos")]
 lazy_static::lazy_static! {
@@ -937,39 +927,6 @@ impl Config {
             a
         }
     }
-
-    pub async fn get_local_ip() -> String {
-        let url: &str = "http://10.6.1.100/api/getIpAddress";
-        let client = reqwest::blocking::Client::new();
-        match client.get(url).send() {
-            Ok(response) => match response.json::<ResponseBody>() {
-                Ok(body) => {
-                    let ip = body.data.ip;
-                    let cleaned_ip = ip.strip_prefix("::ffff:").unwrap_or(&ip);
-                    cleaned_ip.to_string()
-                }
-                Err(_) => "".to_string(),
-            },
-            Err(_) => "".to_string(),
-        }
-    }
-
-    pub fn get_ip_address() -> String {
-        let url: &str = "http://10.6.1.100/api/getIpAddress";
-        let client = reqwest::blocking::Client::new();
-        match client.get(url).send() {
-            Ok(response) => match response.json::<ResponseBody>() {
-                Ok(body) => {
-                    let ip = body.data.ip;
-                    let cleaned_ip = ip.strip_prefix("::ffff:").unwrap_or(&ip);
-                    cleaned_ip.to_string()
-                }
-                Err(_) => "".to_string(),
-            },
-            Err(_) => "".to_string(),
-        }
-    }
-
     pub fn get_options() -> HashMap<String, String> {
         let mut res = DEFAULT_SETTINGS.read().unwrap().clone();
         res.extend(CONFIG2.read().unwrap().options.clone());
