@@ -33,7 +33,6 @@ impl WsFramedStream {
         let url_str = url.as_ref();
 
         // to-do: websocket proxy.
-        log::info!("{:?}", url_str);
 
         let request = url_str
             .into_client_request()
@@ -44,6 +43,10 @@ impl WsFramedStream {
 
         let addr = match stream.get_ref() {
             MaybeTlsStream::Plain(tcp) => tcp.peer_addr()?,
+            #[cfg(any(target_os = "macos", target_os = "windows"))]
+            MaybeTlsStream::NativeTls(tls) => tls.get_ref().get_ref().get_ref().peer_addr()?,
+            #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+            MaybeTlsStream::Rustls(tls) => tls.get_ref().0.peer_addr()?,
             _ => return Err(Error::new(ErrorKind::Other, "Unsupported stream type").into()),
         };
 
@@ -126,14 +129,11 @@ impl WsFramedStream {
 
     #[inline]
     pub async fn next(&mut self) -> Option<Result<BytesMut, Error>> {
-        log::debug!("Waiting for next message");
-
         while let Some(msg) = self.stream.next().await {
-            log::debug!("receive msg: {:?}", msg);
             let msg = match msg {
                 Ok(msg) => msg,
                 Err(e) => {
-                    log::debug!("{}", e);
+                    log::error!("{}", e);
                     return Some(Err(Error::new(
                         ErrorKind::Other,
                         format!("WebSocket protocol error: {}", e),
@@ -141,10 +141,8 @@ impl WsFramedStream {
                 }
             };
 
-            log::debug!("Received message type: {}", msg.to_string());
             match msg {
                 WsMessage::Binary(data) => {
-                    log::info!("Received binary data ({} bytes)", data.len());
                     let mut bytes = BytesMut::from(&data[..]);
                     if let Some(key) = self.encrypt.as_mut() {
                         if let Err(err) = key.dec(&mut bytes) {
@@ -154,16 +152,13 @@ impl WsFramedStream {
                     return Some(Ok(bytes));
                 }
                 WsMessage::Text(text) => {
-                    log::debug!("Received text message, converting to binary");
                     let bytes = BytesMut::from(text.as_bytes());
                     return Some(Ok(bytes));
                 }
                 WsMessage::Close(_) => {
-                    log::info!("Received close frame");
                     return None;
                 }
                 _ => {
-                    log::debug!("Unhandled message type: {}", msg.to_string());
                     continue;
                 }
             }

@@ -12,6 +12,10 @@ use tokio_socks::{IntoTargetAddr, TargetAddr};
 #[inline]
 pub fn check_port<T: std::string::ToString>(host: T, port: i32) -> String {
     let host = host.to_string();
+    // Return WebSocket URLs unchanged
+    if host.starts_with("ws://") || host.starts_with("wss://") {
+        return host;
+    }
     if crate::is_ipv6_str(&host) {
         if host.starts_with('[') {
             return host;
@@ -27,6 +31,10 @@ pub fn check_port<T: std::string::ToString>(host: T, port: i32) -> String {
 #[inline]
 pub fn increase_port<T: std::string::ToString>(host: T, offset: i32) -> String {
     let host = host.to_string();
+    // Return WebSocket URLs unchanged, as we should handle them elsewhere
+    if host.starts_with("ws://") || host.starts_with("wss://") {
+        return host;
+    }
     if crate::is_ipv6_str(&host) {
         if host.starts_with('[') {
             let tmp: Vec<&str> = host.split("]:").collect();
@@ -162,9 +170,28 @@ pub async fn query_nip_io(addr: &SocketAddr) -> ResultType<SocketAddr> {
 
 #[inline]
 pub fn ipv4_to_ipv6(addr: String, ipv4: bool) -> String {
-    if !ipv4 && crate::is_ipv4_str(&addr) {
+    if ipv4 {
+        return addr;
+    }
+
+    // Handle regular IPv4 addresses
+    if crate::is_ipv4_str(&addr) {
         if let Some(ip) = addr.split(':').next() {
             return addr.replace(ip, &format!("{ip}.nip.io"));
+        }
+    }
+
+    // Handle both WebSocket and Secure WebSocket URLs
+    if addr.starts_with("ws://") || addr.starts_with("wss://") {
+        let without_prefix = if addr.starts_with("ws://") {
+            &addr[5..]
+        } else {
+            &addr[6..]
+        };
+        if crate::is_ipv4_str(without_prefix) {
+            if let Some(ip) = without_prefix.split(':').next() {
+                return addr.replace(ip, &format!("{ip}.nip.io"));
+            }
         }
     }
     addr
@@ -267,6 +294,15 @@ mod tests {
             return;
         }
         assert!(query_nip_io(&"1.1.1.1:80".parse().unwrap()).await.is_err());
+        // Test WebSocket URLs with IPv4 addresses
+        assert_eq!(
+            ipv4_to_ipv6("ws://1.2.3.4:21119".to_owned(), false),
+            "ws://1.2.3.4.nip.io:21119"
+        );
+        assert_eq!(
+            ipv4_to_ipv6("wss://1.2.3.4:21119".to_owned(), false),
+            "wss://1.2.3.4.nip.io:21119"
+        );
     }
 
     #[test]
