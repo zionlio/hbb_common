@@ -98,11 +98,11 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rustdesk.minishare.top"];
+pub const RS_PUB_KEY: &str = "nZQjlS7rLAYqaDyy8MpgWQGXG+zOa8VtC7pMGMXX1sM=";
 
-pub const RENDEZVOUS_PORT: i32 = 21116;
-pub const RELAY_PORT: i32 = 21117;
+pub const RENDEZVOUS_PORT: i32 = 30001;
+pub const RELAY_PORT: i32 = 30002;
 pub const WS_RENDEZVOUS_PORT: i32 = 21118;
 pub const WS_RELAY_PORT: i32 = 21119;
 
