@@ -40,6 +40,7 @@ pub const COMPRESS_LEVEL: i32 = 3;
 const SERIAL: i32 = 3;
 const PASSWORD_ENC_VERSION: &str = "00";
 pub const ENCRYPT_MAX_LEN: usize = 128; // used for password, pin, etc, not for all
+const MIN_ID_LEN: usize = 6;
 
 #[cfg(target_os = "macos")]
 lazy_static::lazy_static! {
@@ -836,6 +837,25 @@ impl Config {
         Self::get_auto_id()
     }
 
+    fn normalize_id(id: String) -> String {
+        let id = id.replace(" ", "-");
+        // The max length is not checked.
+        // The hostname is usually not too long.
+        if id.len() < MIN_ID_LEN {
+            if id.len() < MIN_ID_LEN - 1 {
+                format!(
+                    "{}-{}",
+                    id,
+                    Self::get_auto_password(MIN_ID_LEN - 1 - id.len())
+                )
+            } else {
+                format!("{}-", id)
+            }
+        } else {
+            id
+        }
+    }
+
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     fn gen_id() -> Option<String> {
         let hostname_as_id = BUILTIN_SETTINGS
@@ -846,7 +866,14 @@ impl Config {
             .unwrap_or(false);
         if hostname_as_id {
             match whoami::fallible::hostname() {
-                Ok(h) => Some(h.replace(" ", "-")),
+                Ok(h) => {
+                    if h.is_empty() {
+                        log::warn!("Got empty hostname, fallback to auto id");
+                        Self::get_auto_id()
+                    } else {
+                        Some(Self::normalize_id(h))
+                    }
+                }
                 Err(e) => {
                     log::warn!("Failed to get hostname, \"{}\", fallback to auto id", e);
                     Self::get_auto_id()
@@ -2915,5 +2942,24 @@ mod tests {
                 0o600
             );
         }
+    }
+
+    #[test]
+    fn test_normalize_id() {
+        let id: String = "123456789".to_string();
+        assert_eq!(Config::normalize_id(id.clone()), id);
+
+        let id = "User's PC".to_string();
+        assert_eq!(Config::normalize_id(id.clone()), "User's-PC".to_string());
+
+        let id = "PC de l'utilisateur".to_string();
+        assert_eq!(
+            Config::normalize_id(id.clone()),
+            "PC-de-l'utilisateur".to_string()
+        );
+
+        let id = "ÜÄ3".to_string();
+        assert_eq!(Config::normalize_id(id.clone()).len(), MIN_ID_LEN);
+        assert_eq!(Config::normalize_id(id.clone())[0..id.len()], id[..]);
     }
 }
