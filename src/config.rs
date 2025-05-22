@@ -1,66 +1,66 @@
-use std::{
-    collections::{HashMap, HashSet},
+use   使用   使用   使用 std::   使用std:: {{
+    collections::集合::{HashMap, HashSet},{HashMap, HashSet},
     fs,
-    io::{Read, Write},
-    net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
+    io::   io::{读、写},{Read   读, Write   写},
+    net::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr}，{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr},
     ops::{Deref, DerefMut},
-    path::{Path, PathBuf},
-    sync::{Mutex, RwLock},
-    time::{Duration, Instant, SystemTime},
+    path::   路径::{路径,PathBuf},{Path   路径, PathBuf},
+    sync::   同步:{互斥,RwLock},{Mutex   互斥锁, RwLock},
+    time::time::{Duration   持续时间, Instant   即时, SystemTime}，{Duration   持续时间, Instant, SystemTime},
 };
 
-use anyhow::Result;
-use bytes::Bytes;
-use rand::Rng;
-use regex::Regex;
-use serde as de;
-use serde_derive::{Deserialize, Serialize};
-use serde_json;
-use sodiumoxide::base64;
-use sodiumoxide::crypto::sign;
+use   使用 anyhow::   使用总之::结果;Result;
+use   使用 bytes::   使用字节::字节;Bytes;
+use   使用 rand::   使用兰德::提高;Rng;
+use   使用 regex::   使用正则表达式::正则表达式;Regex;
+use   使用 serde as   作为 de;
+use   使用 serde_derive::使用serde_derive::{反序列化，序列化}；{Deserialize, Serialize};
+use   使用    使用serde_json;serde_json;
+use   使用 sodiumoxide::   使用sodiumoxide:: base64;base64;
+use   使用 sodiumoxide::crypto::使用sodiumoxide::密码::标志;sign;
 
-use crate::{
-    compress::{compress, decompress},
-    log,
-    password_security::{
+use   使用    使用箱::{crate   箱::{
+    compress::压缩:{}压缩,解压,{compress   压缩, decompress   解压缩},
+       日志,log   日志,
+    password_security::   password_security: {{
         decrypt_str_or_original, decrypt_vec_or_original, encrypt_str_or_original,
-        encrypt_vec_or_original, symmetric_crypt,
+        encrypt_vec_or_original symmetric_crypt,encrypt_vec_or_original, symmetric_crypt,
     },
 };
 
-pub const RENDEZVOUS_TIMEOUT: u64 = 12_000;
-pub const CONNECT_TIMEOUT: u64 = 18_000;
-pub const READ_TIMEOUT: u64 = 18_000;
+pub   酒吧 pub   酒吧 const   常量 RENDEZVOUS_TIMEOUT: u64 = 12_000；const   常量 RENDEZVOUS_TIMEOUT: u64 = 12_000;
+pub   酒吧 pub   酒吧 const   常量连接超时：u64 = 18_000；const   常量 CONNECT_TIMEOUT: u64 = 18_000;
+pub   酒吧 u64 = 18_000；const   常量 READ_TIMEOUT: u64 = 18_000;
 // https://github.com/quic-go/quic-go/issues/525#issuecomment-294531351
 // https://datatracker.ietf.org/doc/html/draft-hamilton-early-deployment-quic-00#section-6.10
-// 15 seconds is recommended by quic, though oneSIP recommend 25 seconds,
+// 15 seconds is recommended by quic, though oneSIP recommend 25 seconds,// quic推荐15秒，而oneSIP推荐25秒，
 // https://www.onsip.com/voip-resources/voip-fundamentals/what-is-nat-keepalive
-pub const REG_INTERVAL: i64 = 15_000;
-pub const COMPRESS_LEVEL: i32 = 3;
-const SERIAL: i32 = 3;
-const PASSWORD_ENC_VERSION: &str = "00";
-pub const ENCRYPT_MAX_LEN: usize = 128; // used for password, pin, etc, not for all
+pub const REG_INTERVAL: i64 = 15_000;REG_INTERVAL: i64 = 15_000；
+pub const COMPRESS_LEVEL: i32 = 3;pub   酒吧 const   常量 COMPRESS_LEVEL: i32 = 3；
+const SERIAL: i32 = 3;   const   常量序列：i32 = 3；
+const PASSWORD_ENC_VERSION: &str = "00";const   常量 PASSWORD_ENC_VERSION: &str = "00"；
+pub const ENCRYPT_MAX_LEN: usize = 128; // used for password, pin, etc, not for all加密长度：128；//用于密码、pin等，但不是所有的
 
 #[cfg(target_os = "macos")]
-lazy_static::lazy_static! {
-    pub static ref ORG: RwLock<String> = RwLock::new("com.carriez".to_owned());
+lazy_static::lazy_static! {lazy_static: lazy_static !{
+    pub static ref ORG: RwLock<String> = RwLock::new("com.carriez".to_owned());pub static ref ORG: RwLock = RwLock::new("com.carriez".to_owned())；
 }
 
-type Size = (i32, i32, i32, i32);
+type Size = (i32, i32, i32, i32);类型大小= (i32, i32, i32, i32)；
 type KeyPair = (Vec<u8>, Vec<u8>);
 
-lazy_static::lazy_static! {
-    static ref CONFIG: RwLock<Config> = RwLock::new(Config::load());
-    static ref CONFIG2: RwLock<Config2> = RwLock::new(Config2::load());
-    static ref LOCAL_CONFIG: RwLock<LocalConfig> = RwLock::new(LocalConfig::load());
-    static ref STATUS: RwLock<Status> = RwLock::new(Status::load());
-    static ref TRUSTED_DEVICES: RwLock<(Vec<TrustedDevice>, bool)> = Default::default();
-    static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();
-    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("".to_owned());
-    pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();
-    pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());
-    static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();
-    static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));
+lazy_static::lazy_static! {lazy_static: lazy_static !{
+    static ref CONFIG: RwLock<Config> = RwLock::new(Config::load());静态ref CONFIG: RwLock< CONFIG > = RwLock::new(CONFIG::load())；
+    static ref CONFIG2: RwLock<Config2> = RwLock::new(Config2::load());静态ref CONFIG2: RwLock< CONFIG2 > = RwLock::new(CONFIG2::load())；
+    static ref LOCAL_CONFIG: RwLock<LocalConfig> = RwLock::new(LocalConfig::load());静态ref LOCAL_CONFIG: RwLock = RwLock::new(LocalConfig::load())；静态ref LOCAL_CONFIG: RwLock::new(LocalConfig::load())；
+    static ref STATUS: RwLock<Status> = RwLock::new(Status::load());静态ref STATUS: RwLock< STATUS > = RwLock::new(STATUS::load())；
+    static ref TRUSTED_DEVICES: RwLock<(Vec<TrustedDevice>, bool)> = Default::default();TRUSTED_DEVICES: RwLock<(Vec = Default:: Default ()；
+    static ref ONLINE: Mutex<HashMap<String, i64>> = Default::default();静态ref ONLINE: Mutex> = Default:: Default ()；
+    pub static ref PROD_RENDEZVOUS_SERVER: RwLock<String> = RwLock::new("".to_owned());pub static prod_ous_server: RwLock = RwLock::new("".to_owned())；
+    pub static ref EXE_RENDEZVOUS_SERVER: RwLock<String> = Default::default();pub static ref EXE_RENDEZVOUS_SERVER: RwLock = Default:: Default ()；
+    pub static ref APP_NAME: RwLock<String> = RwLock::new("RustDesk".to_owned());pub static ref APP_NAME: RwLock = RwLock::new("RustDesk".to_owned())；
+    static ref KEY_PAIR: Mutex<Option<KeyPair>> = Default::default();静态ref KEY_PAIR: Mutex> = Default:: Default ()；
+    static ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()));静态ref USER_DEFAULT_CONFIG: RwLock<(UserDefaultConfig, Instant)> = RwLock::new((UserDefaultConfig::load(), Instant::now()))；
     pub static ref NEW_STORED_PEER_CONFIG: Mutex<HashSet<String>> = Default::default();
     pub static ref DEFAULT_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
@@ -100,8 +100,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["rustdesk.aaaik.com"];
+pub const RS_PUB_KEY: &str = "zb3z2JGGTvFzIZ7D71pUg18zBNstNfLQ0EkHcwrdV9A=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
