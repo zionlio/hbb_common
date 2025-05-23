@@ -100,8 +100,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["8.138.31.188"];
+pub const RS_PUB_KEY: &str = "Z+X0WpudjlB8FtQImov0wlTxs5wJRI7gC7eIK9cbMpY=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -2459,7 +2459,6 @@ pub mod keys {
     pub const OPTION_ENABLE_TRUSTED_DEVICES: &str = "enable-trusted-devices";
     pub const OPTION_AV1_TEST: &str = "av1-test";
     pub const OPTION_TRACKPAD_SPEED: &str = "trackpad-speed";
-    pub const OPTION_REGISTER_DEVICE: &str = "register-device";
 
     // buildin options
     pub const OPTION_DISPLAY_NAME: &str = "display-name";
@@ -2648,7 +2647,6 @@ pub mod keys {
         OPTION_ONE_WAY_FILE_TRANSFER,
         OPTION_ALLOW_HTTPS_21114,
         OPTION_ALLOW_HOSTNAME_AS_ID,
-        OPTION_REGISTER_DEVICE,
     ];
 }
 
