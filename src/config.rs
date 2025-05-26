@@ -101,7 +101,7 @@ const CHARS: &[char] = &[
 ];
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &["rd.4everhao.cn"];
-pub const PUBLIC_RS_PUB_KEY: &str = "y8+C4vfj9p+qQuYHyA5K8HeAT8FaXw9MrVixOjFRO34=";
+pub const RS_PUB_KEY: &str = "y8+C4vfj9p+qQuYHyA5K8HeAT8FaXw9MrVixOjFRO34=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
