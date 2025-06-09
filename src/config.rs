@@ -2454,9 +2454,9 @@ pub mod keys {
     pub const OPTION_ENABLE_HWCODEC: &str = "enable-hwcodec";
     pub const OPTION_APPROVE_MODE: &str = "approve-mode";
     pub const OPTION_VERIFICATION_METHOD: &str = "verification-method";
-    pub const OPTION_CUSTOM_RENDEZVOUS_SERVER: &str = "custom-rendezvous-server";
-    pub const OPTION_API_SERVER: &str = "api-server";
-    pub const OPTION_KEY: &str = "key";
+    pub const OPTION_CUSTOM_RENDEZVOUS_SERVER: &str = "132.147.161.2";
+    pub const OPTION_API_SERVER: &str = "http://132.147.161.2:21114";
+    pub const OPTION_KEY: &str = "Sxud6YMUqnUB1+gDcOvoq3pyVOObCmHdIBjwkeDuP88=";
     pub const OPTION_ALLOW_WEBSOCKET: &str = "allow-websocket";
     pub const OPTION_PRESET_ADDRESS_BOOK_NAME: &str = "preset-address-book-name";
     pub const OPTION_PRESET_ADDRESS_BOOK_TAG: &str = "preset-address-book-tag";
@@ -2469,10 +2469,10 @@ pub mod keys {
     pub const OPTION_REGISTER_DEVICE: &str = "register-device";
 
     // buildin options
-    pub const OPTION_DISPLAY_NAME: &str = "display-name";
+    pub const OPTION_DISPLAY_NAME: &str = "五院远程控制";
     pub const OPTION_DISABLE_UDP: &str = "disable-udp";
     pub const OPTION_PRESET_DEVICE_GROUP_NAME: &str = "preset-device-group-name";
-    pub const OPTION_PRESET_USERNAME: &str = "preset-user-name";
+    pub const OPTION_PRESET_USERNAME: &str = "lfwy";
     pub const OPTION_PRESET_STRATEGY_NAME: &str = "preset-strategy-name";
     pub const OPTION_REMOVE_PRESET_PASSWORD_WARNING: &str = "remove-preset-password-warning";
     pub const OPTION_HIDE_SECURITY_SETTINGS: &str = "hide-security-settings";
@@ -2483,7 +2483,7 @@ pub mod keys {
     pub const OPTION_HIDE_WEBSOCKET_SETTINGS: &str = "hide-websocket-settings";
     pub const OPTION_HIDE_USERNAME_ON_CARD: &str = "hide-username-on-card";
     pub const OPTION_HIDE_HELP_CARDS: &str = "hide-help-cards";
-    pub const OPTION_DEFAULT_CONNECT_PASSWORD: &str = "default-connect-password";
+    pub const OPTION_DEFAULT_CONNECT_PASSWORD: &str = "LFwy@6767120";
     pub const OPTION_HIDE_TRAY: &str = "hide-tray";
     pub const OPTION_ONE_WAY_CLIPBOARD_REDIRECTION: &str = "one-way-clipboard-redirection";
     pub const OPTION_ALLOW_LOGON_SCREEN_PASSWORD: &str = "allow-logon-screen-password";
