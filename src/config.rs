@@ -103,8 +103,8 @@ const CHARS: &[char] = &[
 pub const RENDEZVOUS_SERVERS: &[&str] = &["cgd.gdhxf.vip"];
 pub const RS_PUB_KEY: &str = "Ir4mvXivIPyyZIt5hx1467dDD2MoN5Qiu6LZ5e4XUeM=";
 
-pub const RENDEZVOUS_PORT: i32 = 36436;
-pub const RELAY_PORT: i32 = 36527;
+pub const RENDEZVOUS_PORT: i32 = 21116;
+pub const RELAY_PORT: i32 = 21117;
 pub const WS_RENDEZVOUS_PORT: i32 = 21118;
 pub const WS_RELAY_PORT: i32 = 21119;
 
