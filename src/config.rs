@@ -2429,6 +2429,11 @@ pub fn use_ws() -> bool {
     option2bool(option, &Config::get_option(option))
 }
 
+pub fn allow_insecure_tls_fallback() -> bool {
+    let option = keys::OPTION_ALLOW_INSECURE_TLS_FALLBACK;
+    option2bool(option, &Config::get_option(option))
+}
+
 pub mod keys {
         "my modification";
     pub const DEFAULT_API_SERVER: &str = "https://nas.zionlio.com";
@@ -2528,14 +2533,16 @@ pub mod keys {
     pub const OPTION_TRACKPAD_SPEED: &str = "trackpad-speed";
     pub const OPTION_REGISTER_DEVICE: &str = "register-device";
     pub const OPTION_RELAY_SERVER: &str = "relay-server";
+    pub const OPTION_DISABLE_UDP: &str = "disable-udp";
+    pub const OPTION_ALLOW_INSECURE_TLS_FALLBACK: &str = "allow-insecure-tls-fallback";
     pub const OPTION_SHOW_VIRTUAL_MOUSE: &str = "show-virtual-mouse";
     // joystick is the virtual mouse.
     // So `OPTION_SHOW_VIRTUAL_MOUSE` should also be set if `OPTION_SHOW_VIRTUAL_JOYSTICK` is set.
     pub const OPTION_SHOW_VIRTUAL_JOYSTICK: &str = "show-virtual-joystick";
+    pub const OPTION_ENABLE_FLUTTER_HTTP_ON_RUST: &str = "enable-flutter-http-on-rust";
 
     // built-in options
     pub const OPTION_DISPLAY_NAME: &str = "display-name";
-    pub const OPTION_DISABLE_UDP: &str = "disable-udp";
     pub const OPTION_PRESET_DEVICE_GROUP_NAME: &str = "preset-device-group-name";
     pub const OPTION_PRESET_USERNAME: &str = "preset-user-name";
     pub const OPTION_PRESET_STRATEGY_NAME: &str = "preset-strategy-name";
@@ -2666,6 +2673,7 @@ pub mod keys {
         OPTION_TOUCH_MODE,
         OPTION_SHOW_VIRTUAL_MOUSE,
         OPTION_SHOW_VIRTUAL_JOYSTICK,
+        OPTION_ENABLE_FLUTTER_HTTP_ON_RUST,
     ];
     // DEFAULT_SETTINGS, OVERWRITE_SETTINGS
     pub const KEYS_SETTINGS: &[&str] = &[
@@ -2718,12 +2726,12 @@ pub mod keys {
         OPTION_ENABLE_ANDROID_SOFTWARE_ENCODING_HALF_SCALE,
         OPTION_ENABLE_TRUSTED_DEVICES,
         OPTION_RELAY_SERVER,
+        OPTION_DISABLE_UDP,
     ];
 
     // BUILDIN_SETTINGS
     pub const KEYS_BUILDIN_SETTINGS: &[&str] = &[
         OPTION_DISPLAY_NAME,
-        OPTION_DISABLE_UDP,
         OPTION_PRESET_DEVICE_GROUP_NAME,
         OPTION_PRESET_USERNAME,
         OPTION_PRESET_STRATEGY_NAME,
