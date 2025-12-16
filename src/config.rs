@@ -1081,7 +1081,9 @@ impl Config {
             .get("password")
             .map_or(false, |v| v == password)
         {
-            return;
+            if CONFIG.read().unwrap().password.is_empty() {
+                return;
+            }
         }
         let mut config = CONFIG.write().unwrap();
         if password == config.password {
