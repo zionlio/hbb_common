@@ -591,7 +591,7 @@ impl Config {
         pub fn get_api_server() -> String {
             let api_server = Self::get_option(keys::OPTION_API_SERVER);
             if api_server.is_empty() {
-                DEFAULT_API_SERVER.to_string()
+                keys::DEFAULT_API_SERVER.to_string()
             } else {
                 api_server
             }
