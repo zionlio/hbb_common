@@ -116,7 +116,7 @@ const CHARS: &[char] = &[
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &["nas.zionlio.com"];
 pub const RS_PUB_KEY: &str = "nbZiY4QtQC8eYYYrpzjNy7IZECe6zNFKCFBvOHFuXAs=";
-
+pub const DEFAULT_API_SERVER: &str = "https://nas.zionlio.com"
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
 pub const WS_RENDEZVOUS_PORT: i32 = 21118;
@@ -588,16 +588,6 @@ pub fn store_path<T: serde::Serialize>(path: PathBuf, cfg: T) -> crate::ResultTy
 }
 
 impl Config {
-        pub fn get_api_server() -> String {
-            let api_server = Self::get_option(keys::OPTION_API_SERVER);
-            if api_server.is_empty() {
-                keys::DEFAULT_API_SERVER.to_string()
-            } else {
-                api_server
-            }
-        }
-
-
     fn load_<T: serde::Serialize + serde::de::DeserializeOwned + Default + std::fmt::Debug>(
         suffix: &str,
     ) -> T {
@@ -2858,7 +2848,6 @@ pub fn allow_insecure_tls_fallback() -> bool {
 }
 
 pub mod keys {
-    pub const DEFAULT_API_SERVER: &str = "https://nas.zionlio.com";
     pub const OPTION_VIEW_ONLY: &str = "view_only";
     pub const OPTION_SHOW_MONITORS_TOOLBAR: &str = "show_monitors_toolbar";
     pub const OPTION_COLLAPSE_TOOLBAR: &str = "collapse_toolbar";
