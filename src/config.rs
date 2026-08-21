@@ -116,7 +116,7 @@ const CHARS: &[char] = &[
 
 pub const RENDEZVOUS_SERVERS: &[&str] = &["nas.zionlio.com"];
 pub const RS_PUB_KEY: &str = "nbZiY4QtQC8eYYYrpzjNy7IZECe6zNFKCFBvOHFuXAs=";
-pub const DEFAULT_API_SERVER: &str = "https://nas.zionlio.com"
+pub const DEFAULT_API_SERVER: &str = "https://nas.zionlio.com";
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
 pub const WS_RENDEZVOUS_PORT: i32 = 21118;
