@@ -588,7 +588,6 @@ pub fn store_path<T: serde::Serialize>(path: PathBuf, cfg: T) -> crate::ResultTy
 }
 
 impl Config {
-        "my modification"
         pub fn get_api_server() -> String {
             let api_server = Self::get_option(keys::OPTION_API_SERVER);
             if api_server.is_empty() {
@@ -2859,9 +2858,6 @@ pub fn allow_insecure_tls_fallback() -> bool {
 }
 
 pub mod keys {
-        "my modification";
-    pub const DEFAULT_API_SERVER: &str = "https://nas.zionlio.com";
-
     pub const OPTION_VIEW_ONLY: &str = "view_only";
     pub const OPTION_SHOW_MONITORS_TOOLBAR: &str = "show_monitors_toolbar";
     pub const OPTION_COLLAPSE_TOOLBAR: &str = "collapse_toolbar";
